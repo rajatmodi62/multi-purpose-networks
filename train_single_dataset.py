@@ -26,7 +26,7 @@ from utils.utils import progress_bar
 #argparser arguments 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 
-parser.add_argument("--batch-size", type=int, default=16,
+parser.add_argument("--batch-size", type=int, default=128,
                         help="Training Batch size")
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument("--checkpoint_path", type=str, default="",
