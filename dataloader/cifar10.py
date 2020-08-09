@@ -26,7 +26,7 @@ class CIFAR10(data.Dataset):
 
     def __init__(self, data_root, transform=None, mode='train'):
         super().__init__()
-
+        print("cifar called")
         if transform is not None:
             self.transform = transform
         else:

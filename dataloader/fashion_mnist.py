@@ -15,7 +15,7 @@ from utils.augmentation import get_fashion_mnist_augmentation
 
 
 class FashionMNIST(data.Dataset):
-
+    print("fashion mnist called")
     def __init__(self, data_root, transform=None, mode='train'):
         super().__init__()
         print("fashion mnist called")

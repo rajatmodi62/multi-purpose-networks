@@ -39,8 +39,7 @@ parser.add_argument("--num-workers", type=int, default=2,
 #                     help="Switch this flag on if embedding layer is to be trained")
 args = parser.parse_args()
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
@@ -164,12 +163,12 @@ save_dir = (local_data_path/'experiments'/experiment)
 # get dataloaders
 trainloader, testloader = get_dataloaders()
 # get model without embedding
-model = Backbone()
+model = Backbone().to(device)
 # get classifier
 if args.training_type == "combined":
-    classifier = ClassificationHead(num_classes=20)
+    classifier = ClassificationHead(num_classes=20).to(device)
 else:
-    classifier = ClassificationHead(num_classes=10)
+    classifier = ClassificationHead(num_classes=10).to(device)
 
 # create loss
 criterion = nn.CrossEntropyLoss()
