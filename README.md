@@ -1,6 +1,11 @@
 # multi-purpose-networks
 Conditioning of a neural network on multiple tasks 
 
+
+# Augmentation:
+
+No Augmentation yet for simplicity.
+
 # Links:
 - [Dataset](https://drive.google.com/file/d/1HSABKh49dAS6uCVXNp7e4iD5tkpXMH3P/view?usp=sharing)
 
