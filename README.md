@@ -6,13 +6,13 @@ Conditioning of a neural network on multiple tasks
 
 # Experimentation Details
 
-|       Dataset | Optimizer | Training    | Batch size | Accuracy(%) |
-|--------------:|-----------|-------------|------------|-------------|
-| CIFAR10       | SGD       | Normal      | 128        | 0           |
-| FASHION-MNIST | SGD       | Normal      | 128        | 0           |
-| Combined      | SGD       | Normal      | 128        | 0           |
-| CIFAR10       | SGD       | Conditioned | 128        | 0           |
-| FASHION-MNIST | SGD       | Conditioned | 128        | 0           |
+|               Dataset | Optimizer | Training    | Batch size | Accuracy(%) |
+|----------------------:|-----------|-------------|------------|-------------|
+| CIFAR10               | SGD       | Normal      | 128        | 0           |
+| FASHION-MNIST         | SGD       | Normal      | 128        | 0           |
+| CIFAR + FASHION-MNIST | SGD       | Normal      | 128        | 0           |
+| CIFAR10               | SGD       | Conditioned | 128        | 0           |
+| FASHION-MNIST         | SGD       | Conditioned | 128        | 0           |
 
 # Credits
 
