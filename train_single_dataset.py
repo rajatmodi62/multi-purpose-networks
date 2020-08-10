@@ -27,6 +27,8 @@ parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 
 parser.add_argument("--batch-size", type=int, default=128,
                     help="Training Batch size")
+parser.add_argument("--n_epochs", type=int, default=350,
+                    help="No of epochs")
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument("--checkpoint_path", type=str, default="",
                     help="Checkpoint path to load model checkpoint")
@@ -196,13 +198,13 @@ if args.checkpoint_path != "":
     start_epoch = checkpoint['epoch']
 
 
-def update_learning_rate(epoch):
-
-    global learning_rate
+def update_learning_rate(epoch,n_epochs):
     # update model lr
-    if epoch < 150:
+    ratio= epoch/n_epochs
+    global learning_rate
+    if ratio < 0.4:
         learning_rate = 0.1
-    elif 150 <= epoch < 250:
+    elif 0.4 <= ratio < 0.65:
         learning_rate = 0.01
     else:
         learning_rate = 0.001
@@ -212,14 +214,14 @@ def update_learning_rate(epoch):
     # update classifier learning rate
     for param_group in optim_classifier.param_groups:
         param_group['lr'] = learning_rate
-
+    print("ratio: ",ratio," lr: ",learning_rate)
 
 def main():
 
     # apply the training schedue
-    for epoch in range(start_epoch, start_epoch+350):
+    for epoch in range(start_epoch, args.n_epochs):
         # call train
-        update_learning_rate(epoch)
+        update_learning_rate(epoch,args.n_epochs)
         train_single_dataset(epoch)
         test_single_dataset(epoch)
 
