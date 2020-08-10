@@ -80,6 +80,8 @@ def get_dataloaders():
 def train_single_dataset(epoch):
 
     print('\nEpoch: %d' % epoch)
+    print('\nTotal Epochs: %d' % args.n_epochs)
+
     model.train()
     classifier.train()
     train_loss = 0
