@@ -156,6 +156,8 @@ def test_single_dataset(epoch):
             'classifier': classifier.state_dict(),
             'acc': acc,
             'epoch': epoch,
+            'n_epochs': args.n_epochs
+
         }
         # if not os.path.isdir('checkpoint'):
         #     os.mkdir('checkpoint')

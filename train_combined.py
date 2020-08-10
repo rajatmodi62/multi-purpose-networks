@@ -118,7 +118,8 @@ def dump_config(epoch,save_dir):
         'epoch:': epoch,
         'learning_rate': learning_rate,
         'cifar_acc': best_cifar_acc,
-        'fashion_mnist_acc': best_fashion_mnist_acc
+        'fashion_mnist_acc': best_fashion_mnist_acc,
+        'n_epochs': args.n_epochs
     }
     with open(save_dir+'/config.json', 'w') as fp:
         json.dump(config, fp)
