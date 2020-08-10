@@ -208,7 +208,7 @@ def update_learning_rate(epoch,n_epochs):
     global learning_rate
     if ratio < 0.4:
         learning_rate = 0.1
-    elif 0.4 <= ratio < 0.65:
+    elif 0.4 <= ratio < 0.7:
         learning_rate = 0.01
     else:
         learning_rate = 0.001
