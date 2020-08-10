@@ -78,7 +78,8 @@ def get_dataloaders():
 def train_single_dataset(epoch):
 
     print('\nEpoch: %d' % epoch)
-    print('\nTotal Epochs: %d' % args.n_epochs)
+    print('Total Epochs: %d' % args.n_epochs)
+    print('Training Type: : %s' % args.training_type)
 
     model.train()
     classifier.train()
