@@ -19,6 +19,7 @@ from models.classification_head import ClassificationHead
 #import dataloaders
 from dataloader.cifar10 import CIFAR10
 from dataloader.fashion_mnist import FashionMNIST
+from dataloader.cifar_fashmnist import CIFAR_FASHMNIST
 
 #import progressbar
 from utils.utils import progress_bar
@@ -30,8 +31,8 @@ parser.add_argument("--batch-size", type=int, default=128,
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument("--checkpoint_path", type=str, default="",
                     help="Checkpoint path to load model checkpoint")
-parser.add_argument("--training_type", type=str, default="cifar",
-                    help="type of training (cifar/fashion_mnist")
+parser.add_argument("--training_type", type=str, default="combined",
+                    help="type of training (combined")
 parser.add_argument("--num-workers", type=int, default=2,
                     help="Number of workers for dataloaders")
 # parser.add_argument("--embedding_layer",action='store_true',
@@ -40,37 +41,35 @@ args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-best_acc = 0  # best test accuracy
+best_cifar_acc = 0  # best test accuracy for cifar
+best_fashion_mnist_acc = 0  # best test accuracy for fashion mnist
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
+#define learning rate 
 learning_rate = 0
 # returns trainloader and testloader
-
-
 def get_dataloaders():
-
-    if args.training_type == 'cifar':
-        trainset = CIFAR10(data_root="dataset/cifar10",
-                           transform=None,
-                           mode='train')
-        testset = CIFAR10(data_root="dataset/cifar10",
-                          transform=None,
-                          mode='test')
-    elif args.training_type == 'fashion_mnist':
-        trainset = FashionMNIST(data_root="dataset/fashion-mnist",
+    if args.training_type == 'combined':
+        trainset = CIFAR_FASHMNIST(cifar_data_root="dataset/cifar10",
+                                   fashion_mnist_data_root="dataset/fashion-mnist",
+                                   transform=None,
+                                   mode='train')
+        testset_cifar = CIFAR10(data_root="dataset/cifar10",
                                 transform=None,
-                                mode='train')
-        testset = FashionMNIST(data_root="dataset/fashion-mnist",
-                               transform=None,
-                               mode='test')
+                                mode='test')
+        testset_fashion_mnist = FashionMNIST(data_root="dataset/fashion-mnist",
+                                             transform=None,
+                                             mode='test')
 
     # create dataloaders
     trainloader = torch.utils.data.DataLoader(
         trainset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-    testloader = torch.utils.data.DataLoader(
-        testset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+    testloader_cifar = torch.utils.data.DataLoader(
+        testset_cifar, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+    testloader_fashion_mnist = torch.utils.data.DataLoader(
+        testset_fashion_mnist, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 
-    return trainloader, testloader
+    return trainloader, testloader_cifar, testloader_fashion_mnist
 
 
 def train_single_dataset(epoch):
@@ -103,8 +102,6 @@ def train_single_dataset(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-        
-###################################################
 
 import json 
 #code to dump config at the path 
@@ -113,22 +110,26 @@ def dump_config(epoch,save_dir):
     config={
         'epoch:': epoch,
         'learning_rate': learning_rate,
-        'acc': best_acc,
+        'cifar_acc': best_cifar_acc,
+        'fashion_mnist_acc': best_fashion_mnist_acc
     }
     with open(save_dir+'/config.json', 'w') as fp:
         json.dump(config, fp)
 
-
-def test_single_dataset(epoch):
+def test_combined_datasets(epoch):
     print("in testing code")
-    global best_acc
+    global best_cifar_acc
+    global best_fashion_mnist_acc
+
     model.eval()
     classifier.eval()
+
+    ########## EVALUATE IN CIFAR TESTLOADER ONCE ############################
     test_loss = 0
     correct = 0
     total = 0
     with torch.no_grad():
-        for batch_idx, (inputs, targets, _) in enumerate(testloader):
+        for batch_idx, (inputs, targets, _) in enumerate(testloader_cifar):
             inputs, targets = inputs.to(device), targets.to(device)
             inputs = inputs.permute(0, 3, 1, 2)
             outputs = model(inputs)
@@ -140,34 +141,79 @@ def test_single_dataset(epoch):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
-            progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+            progress_bar(batch_idx, len(testloader_cifar), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-            
+
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc:
+    if acc > best_cifar_acc:
         print('Saving..')
         state = {
             'model': model.state_dict(),
             'classifier': classifier.state_dict(),
-            'acc': acc,
+            'cifar_acc': acc,
+            'fashion_mnist_acc': best_fashion_mnist_acc,
             'epoch': epoch,
         }
         # if not os.path.isdir('checkpoint'):
         #     os.mkdir('checkpoint')
         # dump the dictionary to the
-        torch.save(state, str(save_dir/'checkpoint.pth'))
-        best_acc = acc
-    dump_config(epoch,str(save_dir))
+        torch.save(state, str(save_dir/'cifar'/'checkpoint.pth'))
+        best_cifar_acc = acc
+
+    dump_config(epoch,str(save_dir/'cifar'))
+
+    ########## EVALUATE IN CIFAR TESTLOADER ONCE ############################
+    acc = 0
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets, _) in enumerate(testloader_fashion_mnist):
+            inputs, targets = inputs.to(device), targets.to(device)
+            inputs = inputs.permute(0, 3, 1, 2)
+            outputs = model(inputs)
+            outputs = classifier(outputs)
+            loss = criterion(outputs, targets)
+
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+            progress_bar(batch_idx, len(testloader_fashion_mnist), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                         % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+    # Save checkpoint.
+    acc = 100.*correct/total
+    if acc > best_fashion_mnist_acc:
+        print('Saving..')
+        state = {
+            'model': model.state_dict(),
+            'classifier': classifier.state_dict(),
+            'cifar_acc': best_cifar_acc,
+            'fashion_mnist_acc': acc,
+            'epoch': epoch,
+        }
+        # if not os.path.isdir('checkpoint'):
+        #     os.mkdir('checkpoint')
+        # dump the dictionary to the
+        torch.save(state, str(save_dir/'fashion_mnist'/'checkpoint.pth'))
+        best_fashion_mnist_acc = acc
+
+    dump_config(epoch,str(save_dir/'fashion_mnist'))
+
+
 ###################################### TRAINING STARTS HERE ############################
 local_data_path = Path('.').absolute()
 # create experiment
 experiment = args.training_type
 save_dir = (local_data_path/'experiments'/experiment)
-(save_dir).mkdir(exist_ok=True, parents=True)
+(save_dir/'cifar').mkdir(exist_ok=True, parents=True)
+(save_dir/'fashion_mnist').mkdir(exist_ok=True, parents=True)
 
 # get dataloaders
-trainloader, testloader = get_dataloaders()
+trainloader, testloader_cifar, testloader_fashion_mnist = get_dataloaders()
 # get model without embedding
 model = Backbone().to(device)
 # get classifier
@@ -197,9 +243,8 @@ if args.checkpoint_path != "":
 
 
 def update_learning_rate(epoch):
-
-    global learning_rate
     # update model lr
+    global learning_rate
     if epoch < 150:
         learning_rate = 0.1
     elif 150 <= epoch < 250:
@@ -221,11 +266,13 @@ def main():
         # call train
         update_learning_rate(epoch)
         train_single_dataset(epoch)
-        test_single_dataset(epoch)
+        test_combined_datasets(epoch)
 
-        print("epoch: ", epoch, "best accuracy found is: ", best_acc)
+        print("epoch: ", epoch, "Cifar best accuracy found is: ", best_cifar_acc,
+              "Cifar best accuracy found is: ", best_fashion_mnist_acc)
 
-    print("overall best accuracy found is: ", best_acc)
+    print("Cifar best accuracy found is: ", best_cifar_acc,
+          "Cifar best accuracy found is: ", best_fashion_mnist_acc)
 
 
 if __name__ == '__main__':
