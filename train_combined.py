@@ -109,7 +109,7 @@ def train_single_dataset(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
+        
 import json 
 #code to dump config at the path 
 def dump_config(epoch,save_dir):
@@ -171,7 +171,7 @@ def test_combined_datasets(epoch):
 
     dump_config(epoch,str(save_dir/'cifar'))
 
-    ########## EVALUATE IN CIFAR TESTLOADER ONCE ############################
+    ########## EVALUATE IN FASHION MNIST  TESTLOADER ONCE ############################
     acc = 0
     test_loss = 0
     correct = 0
@@ -182,10 +182,15 @@ def test_combined_datasets(epoch):
             inputs = inputs.permute(0, 3, 1, 2)
             outputs = model(inputs)
             outputs = classifier(outputs)
+            # print("targets",targets)
+            targets= targets+10
+            #need to add 10 to targets since fashion mnist classes are between (10,20)
+            
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
             _, predicted = outputs.max(1)
+            # print("predicted",predicted)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
