@@ -33,15 +33,18 @@ def get_fashion_mnist_augmentation(mode="train"):
         augmentation= A.Compose([
                             #add randomcrop
                             #add random horizontal flip 
+                            A.Resize(32,32,p=1),
                             A.Normalize(mean= (0.485, 0.456, 0.406),\
                                         std= (0.229, 0.224, 0.225),\
                                         p=1)
+                            
                                  ], p=1)
 
     if mode=='test':
         augmentation= A.Compose([
                             #add randomcrop
-                            #add random horizontal flip 
+                            #add random horizontal flip
+                            A.Resize(32,32,p=1), 
                             A.Normalize(mean= (0.485, 0.456, 0.406),\
                                         std= (0.229, 0.224, 0.225),\
                                         p=1)

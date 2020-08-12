@@ -29,14 +29,14 @@ class Backbone(nn.Module):
             self.backbone= resnet18(in_channels=self.in_channels)
         #define the embedding layer for now 
         if apply_embedding:
-            self.embedding= nn.Embedding(2,28*28*1)
+            self.embedding= nn.Embedding(2,32*32*1)
 
     def forward(self,img,embedding_label=None):
         
         #fwd pass through embedding layer 
         if embedding_label!=None:
             embedding_vector= self.embedding(embedding_label)
-            embedding_vector= embedding_vector.view(-1,1,28,28)
+            embedding_vector= embedding_vector.view(-1,1,32,32)
             #concatenate embedding vector to img along channel dimension 
             img = torch.cat([img,embedding_vector],dim=1)
         #fwd pass through backbone 
@@ -45,7 +45,10 @@ class Backbone(nn.Module):
 
 if __name__ == '__main__':
     model= Backbone(apply_embedding=True)
-    img= torch.randn(8,3,28,28)
+    img= torch.randn(8,3,32,32)
     embedding_label= torch.tensor([[0],[1],[1],[0],[0],[0],[0],[0]])
+    
+    print("img shape",img.shape)
+    print("embedding shape",embedding_label.shape)
     output= model(img,embedding_label)
     print("output shape",output.shape)
