@@ -48,18 +48,21 @@ class CIFAR_FASHMNIST(data.Dataset):
             'Ankle boot'
         ]
 
-        self.classes= self.cifar_classes+ self.fashion_mnist_classes
+        self.classes = self.cifar_classes + self.fashion_mnist_classes
 
-        #get the cifar data 
-        self.cifar_data,self.cifar_targets= self.gather_cifar_data(cifar_data_root, mode=mode)
-        #get fashion_mnist_data
-        self.fashion_mnist_data,self.fashion_mnist_targets= self.gather_fashion_mnist_data(fashion_mnist_data_root, mode=mode)
-        
-        #generate combined dataset 
-        self.data= self.cifar_data + self.fashion_mnist_data
-        #rescale fashion mnist targets according to combined scales 
-        self.fashion_mnist_targets=[target+len(self.cifar_classes) for target in self.fashion_mnist_targets]
-        self.targets= self.cifar_targets+ self.fashion_mnist_targets
+        # get the cifar data
+        self.cifar_data, self.cifar_targets = self.gather_cifar_data(
+            cifar_data_root, mode=mode)
+        # get fashion_mnist_data
+        self.fashion_mnist_data, self.fashion_mnist_targets = self.gather_fashion_mnist_data(
+            fashion_mnist_data_root, mode=mode)
+
+        # generate combined dataset
+        self.data = self.cifar_data + self.fashion_mnist_data
+        # rescale fashion mnist targets according to combined scales
+        self.fashion_mnist_targets = [
+            target+len(self.cifar_classes) for target in self.fashion_mnist_targets]
+        self.targets = self.cifar_targets + self.fashion_mnist_targets
 
     def __getitem__(self, index):
         img, target = self.data[index], int(self.targets[index])
@@ -70,13 +73,13 @@ class CIFAR_FASHMNIST(data.Dataset):
             "conditioning_label": 2,
             "class": self.classes[target]
         }
-       
+
         return img, target, metadata
 
     def __len__(self):
         return len(self.data)
 
-    def gather_cifar_data(self,cifar_data_root, mode='train'):
+    def gather_cifar_data(self, cifar_data_root, mode='train'):
         train_list = [
             'data_batch_1',
             'data_batch_2',
@@ -107,14 +110,14 @@ class CIFAR_FASHMNIST(data.Dataset):
                     targets.extend(entry['labels'])
                 else:
                     targets.extend(entry['fine_labels'])
-            
+
         data = np.vstack(data).reshape(-1, 3, 32, 32)
         data = data.transpose((0, 2, 3, 1))  # convert to HWC
-        #convert data to a list of numpy arrays of 32X32X3
-        data=[ data[i] for i in range(data.shape[0])]
-        return data,targets
+        # convert data to a list of numpy arrays of 32X32X3
+        data = [data[i] for i in range(data.shape[0])]
+        return data, targets
 
-    def gather_fashion_mnist_data(self,fashion_mnist_data_root, mode="train"):
+    def gather_fashion_mnist_data(self, fashion_mnist_data_root, mode="train"):
         local_data_path = Path('.').absolute()
         if mode == 'train':
             data_file = 'processed/training.pt'
@@ -123,31 +126,31 @@ class CIFAR_FASHMNIST(data.Dataset):
         data, targets = torch.load(
             str(local_data_path/fashion_mnist_data_root/data_file))
         # repeat image along three axis for compatible cnn input
-        data=[np.repeat(img[:, :, np.newaxis], 3, axis=2) for img in data]
-        return data,targets
+        data = [np.repeat(img[:, :, np.newaxis], 3, axis=2) for img in data]
+        return data, targets
+
 
 if __name__ == '__main__':
-    dataset=CIFAR_FASHMNIST(cifar_data_root="dataset/cifar10",\
-                            fashion_mnist_data_root="dataset/fashion-mnist",\
-                            transform=None,\
-                            mode='train')
-
+    dataset = CIFAR_FASHMNIST(cifar_data_root="dataset/cifar10",
+                              fashion_mnist_data_root="dataset/fashion-mnist",
+                              transform=None,
+                              mode='train')
 
     print("training mode", len(dataset))
 
     for i in range(len(dataset)):
-        if i<70000:
+        if i < 70000:
             continue
         img, target, metadata = dataset[i]
         # print(img.shape)
-        print(img.shape,target, metadata['class'])
+        print(img.shape, target, metadata['class'])
         plt.imshow(img)
         plt.show()
     # testing mode
-    dataset=CIFAR_FASHMNIST(cifar_data_root="dataset/cifar10",\
-                            fashion_mnist_data_root="dataset/fashion-mnist",\
-                            transform=None,\
-                            mode='test')
+    dataset = CIFAR_FASHMNIST(cifar_data_root="dataset/cifar10",
+                              fashion_mnist_data_root="dataset/fashion-mnist",
+                              transform=None,
+                              mode='test')
     print("testing mode", len(dataset))
 
     for i in range(len(dataset)):

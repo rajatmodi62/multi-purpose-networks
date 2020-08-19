@@ -1,5 +1,6 @@
 # Training without embedding layer in the model
 
+import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -108,14 +109,16 @@ def train_single_dataset(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-        
+
 ###################################################
 
-import json 
-#code to dump config at the path 
-def dump_config(epoch,save_dir):
-    
-    config={
+
+# code to dump config at the path
+
+
+def dump_config(epoch, save_dir):
+
+    config = {
         'epoch:': epoch,
         'learning_rate': learning_rate,
         'acc': best_acc,
@@ -147,7 +150,7 @@ def test_single_dataset(epoch):
 
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-            
+
     # Save checkpoint.
     acc = 100.*correct/total
     if acc > best_acc:
@@ -165,7 +168,9 @@ def test_single_dataset(epoch):
         # dump the dictionary to the
         torch.save(state, str(save_dir/'checkpoint.pth'))
         best_acc = acc
-    dump_config(epoch,str(save_dir))
+    dump_config(epoch, str(save_dir))
+
+
 ###################################### TRAINING STARTS HERE ############################
 local_data_path = Path('.').absolute()
 # create experiment
@@ -203,9 +208,9 @@ if args.checkpoint_path != "":
     start_epoch = checkpoint['epoch']
 
 
-def update_learning_rate(epoch,n_epochs):
+def update_learning_rate(epoch, n_epochs):
     # update model lr
-    ratio= epoch/n_epochs
+    ratio = epoch/n_epochs
     global learning_rate
     if ratio < 0.4:
         learning_rate = 0.1
@@ -219,14 +224,15 @@ def update_learning_rate(epoch,n_epochs):
     # update classifier learning rate
     for param_group in optim_classifier.param_groups:
         param_group['lr'] = learning_rate
-    print("ratio: ",ratio," lr: ",learning_rate)
+    print("ratio: ", ratio, " lr: ", learning_rate)
+
 
 def main():
 
     # apply the training schedue
     for epoch in range(start_epoch, args.n_epochs):
         # call train
-        update_learning_rate(epoch,args.n_epochs)
+        update_learning_rate(epoch, args.n_epochs)
         train_single_dataset(epoch)
         test_single_dataset(epoch)
 

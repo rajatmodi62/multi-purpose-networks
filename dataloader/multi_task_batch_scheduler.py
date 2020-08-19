@@ -1,4 +1,4 @@
-#code taken from https://gist.github.com/bomri/e797985fbcd367a8e026fef23066a21f#file-multi_task_batch_scheduler-py
+# code taken from https://gist.github.com/bomri/e797985fbcd367a8e026fef23066a21f#file-multi_task_batch_scheduler-py
 import math
 import torch
 from torch.utils.data.sampler import RandomSampler
@@ -8,11 +8,13 @@ class BatchSchedulerSampler(torch.utils.data.sampler.Sampler):
     """
     iterate over tasks and provide a random batch per task in each mini-batch
     """
+
     def __init__(self, dataset, batch_size):
         self.dataset = dataset
         self.batch_size = batch_size
         self.number_of_datasets = len(dataset.datasets)
-        self.largest_dataset_size = max([len(cur_dataset.data) for cur_dataset in dataset.datasets])
+        self.largest_dataset_size = max(
+            [len(cur_dataset.data) for cur_dataset in dataset.datasets])
 
     def __len__(self):
         return self.batch_size * math.ceil(self.largest_dataset_size / self.batch_size) * len(self.dataset.datasets)

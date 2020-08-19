@@ -9,7 +9,8 @@ def get_cifar_augmentation(mode="train"):
     if mode=='train':
         augmentation= A.Compose([
                             #add randomcrop
-                            #add random horizontal flip 
+                            #add random horizontal flip
+                            A.HorizontalFlip(p=0.5),\
                             A.Normalize(mean= (0.485, 0.456, 0.406),\
                                         std= (0.229, 0.224, 0.225),\
                                         p=1)
@@ -33,6 +34,7 @@ def get_fashion_mnist_augmentation(mode="train"):
         augmentation= A.Compose([
                             #add randomcrop
                             #add random horizontal flip 
+                            A.HorizontalFlip(p=0.5),\
                             A.Resize(32,32,p=1),
                             A.Normalize(mean= (0.485, 0.456, 0.406),\
                                         std= (0.229, 0.224, 0.225),\
@@ -57,6 +59,7 @@ def get_cifar_fashmnist_augmentation(mode="train"):
         augmentation= A.Compose([
                             #add randomcrop
                             #add random horizontal flip 
+                            A.HorizontalFlip(p=0.5),\
                             A.Normalize(mean= (0.485, 0.456, 0.406),\
                                         std= (0.229, 0.224, 0.225),\
                                         p=1),\

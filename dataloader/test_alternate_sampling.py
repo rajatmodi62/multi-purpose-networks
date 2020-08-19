@@ -3,7 +3,7 @@ from torch.utils.data.dataset import ConcatDataset
 from dataloader.cifar10 import CIFAR10
 from dataloader.fashion_mnist import FashionMNIST
 from dataloader.multi_task_batch_scheduler import BatchSchedulerSampler
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
 cifar = CIFAR10(data_root="dataset/cifar10",
                 transform=None,
@@ -11,9 +11,9 @@ cifar = CIFAR10(data_root="dataset/cifar10",
                 )
 
 fashion_mnist = FashionMNIST(data_root="dataset/fashion-mnist",
-                            transform=None,
-                            mode='train',
-                            )
+                             transform=None,
+                             mode='train',
+                             )
 
 
 concat_dataset = ConcatDataset([cifar, fashion_mnist])

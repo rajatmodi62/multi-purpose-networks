@@ -1,5 +1,6 @@
 # Training without embedding layer in the model
 
+import json
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -47,9 +48,11 @@ best_cifar_acc = 0  # best test accuracy for cifar
 best_fashion_mnist_acc = 0  # best test accuracy for fashion mnist
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
-#define learning rate 
+# define learning rate
 learning_rate = 0
 # returns trainloader and testloader
+
+
 def get_dataloaders():
     if args.training_type == 'combined':
         # trainset = FashionMNIST(data_root="dataset/fashion-mnist",
@@ -109,12 +112,14 @@ def train_single_dataset(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-        
-import json 
-#code to dump config at the path 
-def dump_config(epoch,save_dir):
-    
-    config={
+
+
+# code to dump config at the path
+
+
+def dump_config(epoch, save_dir):
+
+    config = {
         'epoch:': epoch,
         'learning_rate': learning_rate,
         'cifar_acc': best_cifar_acc,
@@ -123,6 +128,7 @@ def dump_config(epoch,save_dir):
     }
     with open(save_dir+'/config.json', 'w') as fp:
         json.dump(config, fp)
+
 
 def test_combined_datasets(epoch):
     print("in testing code")
@@ -169,7 +175,7 @@ def test_combined_datasets(epoch):
         torch.save(state, str(save_dir/'cifar'/'checkpoint.pth'))
         best_cifar_acc = acc
 
-    dump_config(epoch,str(save_dir/'cifar'))
+    dump_config(epoch, str(save_dir/'cifar'))
 
     ########## EVALUATE IN FASHION MNIST  TESTLOADER ONCE ############################
     acc = 0
@@ -183,9 +189,9 @@ def test_combined_datasets(epoch):
             outputs = model(inputs)
             outputs = classifier(outputs)
             # print("targets",targets)
-            targets= targets+10
-            #need to add 10 to targets since fashion mnist classes are between (10,20)
-            
+            targets = targets+10
+            # need to add 10 to targets since fashion mnist classes are between (10,20)
+
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
@@ -214,7 +220,7 @@ def test_combined_datasets(epoch):
         torch.save(state, str(save_dir/'fashion_mnist'/'checkpoint.pth'))
         best_fashion_mnist_acc = acc
 
-    dump_config(epoch,str(save_dir/'fashion_mnist'))
+    dump_config(epoch, str(save_dir/'fashion_mnist'))
 
 
 ###################################### TRAINING STARTS HERE ############################
@@ -255,9 +261,9 @@ if args.checkpoint_path != "":
     start_epoch = checkpoint['epoch']
 
 
-def update_learning_rate(epoch,n_epochs):
+def update_learning_rate(epoch, n_epochs):
     # update model lr
-    ratio= epoch/n_epochs
+    ratio = epoch/n_epochs
     global learning_rate
     if ratio < 0.4:
         learning_rate = 0.1
@@ -271,7 +277,7 @@ def update_learning_rate(epoch,n_epochs):
     # update classifier learning rate
     for param_group in optim_classifier.param_groups:
         param_group['lr'] = learning_rate
-    print("ratio: ",ratio," lr: ",learning_rate)
+    print("ratio: ", ratio, " lr: ", learning_rate)
 
 
 def main():
@@ -279,7 +285,7 @@ def main():
     # apply the training schedue
     for epoch in range(start_epoch, args.n_epochs):
         # call train
-        update_learning_rate(epoch,args.n_epochs)
+        update_learning_rate(epoch, args.n_epochs)
         train_single_dataset(epoch)
         test_combined_datasets(epoch)
 
