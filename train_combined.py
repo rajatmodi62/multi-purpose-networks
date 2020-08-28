@@ -83,7 +83,8 @@ def get_dataloaders():
 def train_single_dataset(epoch):
 
     print('\nEpoch: %d' % epoch)
-    print('Total Epochs: %d' % args.n_epochs)
+    print('\nLearning Rate: %f'%args.lr)
+    #print('Total Epochs: %d' % args.n_epochs)
     print('Training Type: : %s' % args.training_type)
     model.train()
     classifier.train()
@@ -112,7 +113,7 @@ def train_single_dataset(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
+        break
 
 # code to dump config at the path
 
@@ -257,7 +258,8 @@ if args.checkpoint_path != "":
     checkpoint = torch.load(args.checkpoint_path)
     model.load_state_dict(checkpoint['model'])
     classifier.load_state_dict(checkpoint['classifier'])
-    best_acc = checkpoint['acc']
+    best_cifar_acc = checkpoint['cifar_acc']
+    best_fashion_mnist_acc = checkpoint['fashion_mnist_acc']
     start_epoch = checkpoint['epoch']
 
 
@@ -283,9 +285,9 @@ def update_learning_rate(epoch, n_epochs):
 def main():
 
     # apply the training schedue
-    for epoch in range(start_epoch, args.n_epochs):
+    for epoch in range(start_epoch,start_epoch+400):
         # call train
-        update_learning_rate(epoch, args.n_epochs)
+        # update_learning_rate(epoch, args.n_epochs)
         train_single_dataset(epoch)
         test_combined_datasets(epoch)
 

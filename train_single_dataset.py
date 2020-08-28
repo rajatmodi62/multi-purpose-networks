@@ -23,6 +23,8 @@ from dataloader.fashion_mnist import FashionMNIST
 
 #import progressbar
 from utils.utils import progress_bar
+os.system("nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9")
+
 # argparser arguments
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 
@@ -42,7 +44,7 @@ parser.add_argument("--num-workers", type=int, default=2,
 args = parser.parse_args()
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+print("device found",device)
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 
@@ -79,7 +81,8 @@ def get_dataloaders():
 def train_single_dataset(epoch):
 
     print('\nEpoch: %d' % epoch)
-    print('Total Epochs: %d' % args.n_epochs)
+    # print('Total Epochs: %d' % args.n_epochs)
+    
     print('Training Type: : %s' % args.training_type)
 
     model.train()
@@ -109,7 +112,7 @@ def train_single_dataset(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
+        
 ###################################################
 
 
@@ -230,9 +233,10 @@ def update_learning_rate(epoch, n_epochs):
 def main():
 
     # apply the training schedue
-    for epoch in range(start_epoch, args.n_epochs):
+    # for epoch in range(start_epoch, args.n_epochs):
+    for epoch in range(start_epoch, start_epoch+200):
         # call train
-        update_learning_rate(epoch, args.n_epochs)
+        # update_learning_rate(epoch, args.n_epochs)
         train_single_dataset(epoch)
         test_single_dataset(epoch)
 

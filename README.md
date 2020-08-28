@@ -12,12 +12,12 @@ No Augmentation yet for simplicity.
 # Experimentation Details
 | Dataset       | Optimizer | Training    | Batch size | Epochs | Accuracy(%) |
 |---------------|-----------|-------------|------------|--------|-------------|
-| CIFAR10       | SGD       | Normal      | 128        | 350    | 81.03       |
-| FASHION-MNIST | SGD       | Normal      | 128        | 350    | 92.64       |
-| CIFAR10       | SGD       | Combined    | 128        | 700    | 71.11       |
-| FASHION-MNIST | SGD       | Combined    | 128        | 700    | 92.4        |
-| CIFAR10       | SGD       | Conditioned | 128        | 700    | 0           |
-| FASHION-MNIST | SGD       | Conditioned | 128        | 700    | 0           |
+| CIFAR10       | SGD       | Normal      | 128        | 350    | 95.42       |
+| FASHION-MNIST | SGD       | Normal      | 128        | 350    | 94.83      |
+| CIFAR10       | SGD       | Combined    | 128        | 700    | -       |
+| FASHION-MNIST | SGD       | Combined    | 128        | 700    | -        |
+| CIFAR10       | SGD       | Conditioned | 128        | 700    | -           |
+| FASHION-MNIST | SGD       | Conditioned | 128        | 700    | -           |
 
 # Credits
 

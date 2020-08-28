@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.resnet import resnet18
+# from models.resnet import resnet18
+from models.resnet_baseline import resnet18
 
 
 #Hardcode in_channels if channels other than 3/4 are passed

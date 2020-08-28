@@ -35,8 +35,10 @@ parser.add_argument("--batch-size", type=int, default=128,
 parser.add_argument("--n_epochs", type=int, default=700,
                     help="No of epochs")
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
-parser.add_argument("--checkpoint_path", type=str, default="",
-                    help="Checkpoint path to load model checkpoint")
+parser.add_argument("--cifar_checkpoint_path", type=str, default="",
+                    help="CIFAR10's checkpoint")
+parser.add_argument("--fashion_mnist_checkpoint_path", type=str, default="",
+                    help="FASHION-MNIST's checkpoint")
 parser.add_argument("--training_type", type=str, default="conditioned",
                     help="type of training (conditioned")
 parser.add_argument("--num-workers", type=int, default=2,
@@ -100,7 +102,8 @@ def get_dataloaders():
 # conditional training
 def train(epoch):
     print('\nEpoch: %d' % epoch)
-    print('Total Epochs: %d' % args.n_epochs)
+    print('\nLearning Rate: %f'%args.lr)
+    # print('Total Epochs: %d' % args.n_epochs)
     print('Training Type: : %s' % args.training_type)
 
     model.train()
@@ -155,7 +158,7 @@ def train(epoch):
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
         # break for debugging
-        # break
+        break
 # code to dump config at the path
 
 
@@ -206,12 +209,19 @@ def test(epoch):
     acc = 100.*correct/total
     if acc > best_cifar_acc:
         print('Saving..')
+        # state = {
+        #     'model': model.state_dict(),
+        #     'classifier_cifar': classifier_cifar.state_dict(),
+        #     'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
+        #     'cifar_acc': acc,
+        #     'fashion_mnist_acc': best_fashion_mnist_acc,
+        #     'epoch': epoch,
+        # }
+        # dump only the data for cifar 
         state = {
             'model': model.state_dict(),
             'classifier_cifar': classifier_cifar.state_dict(),
-            'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
             'cifar_acc': acc,
-            'fashion_mnist_acc': best_fashion_mnist_acc,
             'epoch': epoch,
         }
         # if not os.path.isdir('checkpoint'):
@@ -251,11 +261,18 @@ def test(epoch):
     acc = 100.*correct/total
     if acc > best_fashion_mnist_acc:
         print('Saving..')
+        # state = {
+        #     'model': model.state_dict(),
+        #     'classifier_cifar': classifier_cifar.state_dict(),
+        #     'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
+        #     'cifar_acc': best_cifar_acc,
+        #     'fashion_mnist_acc': acc,
+        #     'epoch': epoch,
+        # }
+        #dump ony fashioon mnist data
         state = {
             'model': model.state_dict(),
-            'classifier_cifar': classifier_cifar.state_dict(),
             'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
-            'cifar_acc': best_cifar_acc,
             'fashion_mnist_acc': acc,
             'epoch': epoch,
         }
@@ -298,17 +315,27 @@ optim_classifier_fashion_mnist = optim.SGD(classifier_fashion_mnist.parameters()
                                            momentum=0.9, weight_decay=5e-4)
 
 ############ CODE FOR RESUMING THE TRAINING ###########################################
-if args.checkpoint_path != "":
-    # Load checkpoint.
-    print('==> Resuming from checkpoint..')
-    checkpoint = torch.load(args.checkpoint_path)
+if args.cifar_checkpoint_path != "" and args.fashion_mnist_checkpoint_path!= "":
+    
+    # Load data from cifar checkpoint.
+    print('==> Resuming from cifar..')
+    checkpoint = torch.load(args.cifar_checkpoint_path)
+    # LOAD THE MODEL FROM CIFAR BEST WEIGHT FOR NOW, TRY LOADING FROM FASHION-MNIST IN ANOTHER EXPERIMENT
     model.load_state_dict(checkpoint['model'])
     classifier_cifar.load_state_dict(checkpoint['classifier_cifar'])
-    classifier_fashion_mnist.load_state_dict(checkpoint['classifier_fashion_mnist'])
     best_cifar_acc = checkpoint['cifar_acc']
-    best_fashion_mnist_acc = checkpoint['fashion_mnist_acc']
-    start_epoch = checkpoint['epoch']
+    cifar_epoch = checkpoint['epoch']
 
+    # Load data from fashion-mnist checkpoint.
+    print('==> Resuming from fashion mnist..')
+    checkpoint = torch.load(args.fashion_mnist_checkpoint_path)
+    #model.load_state_dict(checkpoint['model'])
+    classifier_fashion_mnist.load_state_dict(checkpoint['classifier_fashion_mnist'])
+    best_fashion_mnist_acc = checkpoint['fashion_mnist_acc']
+    fashion_mnist_epoch = checkpoint['epoch']
+
+    # Resolve conflicts in loading data from two separate checkpoints 
+    start_epoch= min(cifar_epoch, fashion_mnist_epoch)
 
 def update_learning_rate(epoch, n_epochs):
     # update model lr
@@ -336,9 +363,9 @@ def update_learning_rate(epoch, n_epochs):
 def main():
 
     # apply the training schedue
-    for epoch in range(start_epoch, args.n_epochs):
+    for epoch in range(start_epoch, start_epoch+400):
         # call train
-        update_learning_rate(epoch, args.n_epochs)
+        #update_learning_rate(epoch, args.n_epochs)
         train(epoch)
         test(epoch)
 
