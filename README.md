@@ -14,11 +14,14 @@ Augmentation includes random crop (after padding),horizontal flipping and tensor
 |---------------|-----------|-------------|------------|--------|-------------|
 | CIFAR10       | SGD       | Normal      | 128        | 600    | 95.42       |
 | FASHION-MNIST | SGD       | Normal      | 128        | 600    | 94.83      |
-| CIFAR10       | SGD       | Combined    | 128        | 1200    | -       |
-| FASHION-MNIST | SGD       | Combined    | 128        | 1200    | -        |
-| CIFAR10       | SGD       | Conditioned | 128        | 1200    | -           |
-| FASHION-MNIST | SGD       | Conditioned | 128        | 1200    | -           |
+| CIFAR10       | SGD       | Combined    | 128        | 1200    | 87.71       |
+| FASHION-MNIST | SGD       | Combined    | 128        | 1200    | 78.04        |
+| CIFAR10       | SGD       | Conditioned | 128        | 1200    | 90.54           |
+| FASHION-MNIST | SGD       | Conditioned | 128        | 1200    | 94.42           |
 
+# Improvements 
+Cifar10:2.83%
+FashionMNIST:16.38%
 # Credits
 
 Code has been borrowed largely from [kuangliu/pytorch-cifar](https://github.com/kuangliu/pytorch-cifar)
