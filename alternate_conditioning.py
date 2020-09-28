@@ -61,14 +61,14 @@ if args.dataset=='CIFAR':
                             transform=None,
                             mode='test')
     # Note: I am intentionally keeping wrong label, because we want to check if external conditioning has impact on results
-    embedding_label= 1
+    embedding_label= 0
 else:
     classifier.load_state_dict(checkpoint['classifier_fashion_mnist'])
     testset = FashionMNIST(data_root="dataset/fashion-mnist",
                                         transform=None,
                                         mode='test')
     # Note: I am intentionally keeping wrong label, because we want to check if external conditioning has impact on results
-    embedding_label = 0
+    embedding_label = 1
 
 testloader = torch.utils.data.DataLoader(
         testset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
