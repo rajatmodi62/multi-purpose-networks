@@ -34,7 +34,7 @@ parser.add_argument("--dataset", type=str, default="CIFAR",
 #Some redundant options for making testloaders 
 parser.add_argument("--batch-size", type=int, default=128,
                     help="Training Batch size")
-parser.add_argument("--num-workers", type=int, default=2,
+parser.add_argument("--num-workers", type=int, default=0,
                     help="Number of workers for dataloaders")
 
                    
@@ -61,14 +61,14 @@ if args.dataset=='CIFAR':
                             transform=None,
                             mode='test')
     # Note: I am intentionally keeping wrong label, because we want to check if external conditioning has impact on results
-    embedding_label= 0
+    embedding_label= 1
 else:
     classifier.load_state_dict(checkpoint['classifier_fashion_mnist'])
     testset = FashionMNIST(data_root="dataset/fashion-mnist",
                                         transform=None,
                                         mode='test')
     # Note: I am intentionally keeping wrong label, because we want to check if external conditioning has impact on results
-    embedding_label = 1
+    embedding_label = 0
 
 testloader = torch.utils.data.DataLoader(
         testset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
@@ -97,10 +97,9 @@ def test():
             embedding_labels = embedding_labels.unsqueeze(1)
             outputs = model(inputs, embedding_labels)
             outputs = classifier(outputs)
-            #loss = criterion(outputs, targets)
+            loss = criterion(outputs, targets)
 
-            #test_loss += loss.item()
-            test_loss=0
+            test_loss += loss.item()
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
