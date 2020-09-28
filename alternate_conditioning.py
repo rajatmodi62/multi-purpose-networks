@@ -87,9 +87,11 @@ def test():
             inputs, targets = inputs.to(device), targets.to(device)
             inputs = inputs.permute(0, 3, 1, 2)
             #convert embedding_label to tensor
-            print("inputs shape",inputs.shape)
+            # print("inputs shape",inputs.shape)
+            n_repeats= inputs.shape[0]
             embedding_labels= torch.Tensor(embedding_label).to(device)
             embedding_labels= embedding_labels.type(torch.LongTensor).to(device)
+            embedding_labels = torch.cat(n_repeats*[embedding_labels])
             embedding_labels = embedding_labels.unsqueeze(1)
             outputs = model(inputs, embedding_labels)
             outputs = classifier_cifar(outputs)
