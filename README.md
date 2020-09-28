@@ -16,8 +16,8 @@ Augmentation includes random crop (after padding),horizontal flipping and tensor
 | FASHION-MNIST | SGD       | Normal      | 128        | 600    | 94.83      |
 | CIFAR10       | SGD       | Combined    | 128        | 1200    | 87.71       |
 | FASHION-MNIST | SGD       | Combined    | 128        | 1200    | 78.04        |
-| CIFAR10       | SGD       | Conditioned | 128        | 1200    | 90.54           |
-| FASHION-MNIST | SGD       | Conditioned | 128        | 1200    | 94.42           |
+| CIFAR10       | SGD       | Conditioned | 128        | 1200    | **90.54**           |
+| FASHION-MNIST | SGD       | Conditioned | 128        | 1200    | **94.42**           |
 
 # Improvements 
 Cifar10:2.83%
