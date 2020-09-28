@@ -94,7 +94,7 @@ def test():
             embedding_labels = torch.cat(n_repeats*[embedding_labels])
             embedding_labels = embedding_labels.unsqueeze(1)
             outputs = model(inputs, embedding_labels)
-            outputs = classifier_cifar(outputs)
+            outputs = classifier(outputs)
             loss = criterion(outputs, targets)
 
             test_loss += loss.item()
