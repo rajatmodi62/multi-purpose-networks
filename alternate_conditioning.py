@@ -82,6 +82,8 @@ def test():
     test_loss = 0
     correct = 0
     total = 0
+    criterion = nn.CrossEntropyLoss()
+
     with torch.no_grad():
         for batch_idx, (inputs, targets, meta) in enumerate(testloader):
             inputs, targets = inputs.to(device), targets.to(device)
