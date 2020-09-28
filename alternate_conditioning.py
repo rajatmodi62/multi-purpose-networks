@@ -61,7 +61,7 @@ if args.dataset=='CIFAR':
                             transform=None,
                             mode='test')
     # Note: I am intentionally keeping wrong label, because we want to check if external conditioning has impact on results
-    embedding_label= 1
+    embedding_label= 0
 else:
     classifier.load_state_dict(checkpoint['classifier_fashion_mnist'])
     testset = FashionMNIST(data_root="dataset/fashion-mnist",
@@ -91,9 +91,10 @@ def test():
             #convert embedding_label to tensor
             # print("inputs shape",inputs.shape)
             n_repeats= inputs.shape[0]
-            embedding_labels= torch.Tensor(embedding_label).to(device)
+            embedding_labels = torch.ones(1)*embedding_label
             embedding_labels= embedding_labels.type(torch.LongTensor).to(device)
             embedding_labels = torch.cat(n_repeats*[embedding_labels])
+            print("shape of embedding labels",embedding_labels.shape)
             embedding_labels = embedding_labels.unsqueeze(1)
             outputs = model(inputs, embedding_labels)
             outputs = classifier(outputs)
