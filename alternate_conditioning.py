@@ -97,9 +97,10 @@ def test():
             embedding_labels = embedding_labels.unsqueeze(1)
             outputs = model(inputs, embedding_labels)
             outputs = classifier(outputs)
-            loss = criterion(outputs, targets)
+            #loss = criterion(outputs, targets)
 
-            test_loss += loss.item()
+            #test_loss += loss.item()
+            test_loss=0
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
