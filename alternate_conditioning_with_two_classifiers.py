@@ -114,7 +114,10 @@ def test():
     cifar_acc = 100.*correct/total
     #print("Accuracy is",acc, "for dataset",args.dataset, " conditioning label ", embedding_label )
 
-
+    test_loss = 0
+    correct = 0
+    total = 0
+    criterion = nn.CrossEntropyLoss()
     with torch.no_grad():
         #fashion_mnist fwd pass
         for batch_idx, (inputs, targets, meta) in enumerate(testloader):
