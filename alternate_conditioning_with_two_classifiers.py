@@ -22,7 +22,8 @@ from dataloader.fashion_mnist import FashionMNIST
 #import progressbar
 from utils.utils import progress_bar
 
-
+#tsne 
+from tsne import draw_tsne
 #argparser
 parser = argparse.ArgumentParser(description='Alternate conditioning testing for CIFAR/FashionMNIST')
 
@@ -67,11 +68,12 @@ if args.dataset=='CIFAR':
     testset = CIFAR10(data_root="dataset/cifar10",
                             transform=None,
                             mode='test')
-    
+    print("TESTSET IS CIFAR")
 else:  
     testset = FashionMNIST(data_root="dataset/fashion-mnist",
                                         transform=None,
                                         mode='test')
+    print("TESTSET IS FASHION MNIST")
 testloader = torch.utils.data.DataLoader(
         testset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 
@@ -111,6 +113,8 @@ def test():
 
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+            break
     cifar_acc = 100.*correct/total
     #print("Accuracy is",acc, "for dataset",args.dataset, " conditioning label ", embedding_label )
 
@@ -141,8 +145,13 @@ def test():
 
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+            break
     fashion_mnist_acc = 100.*correct/total
 
     print("accuracy of cifar",cifar_acc, "accuracy of fashion mnist", fashion_mnist_acc, "dataset", args.dataset, "conditioning label", embedding_labels)
 #calling test code 
 test()
+local_data_path = Path('.').absolute()
+(local_data_path/'visualization').mkdir(exist_ok=True, parents=True)
+save_path= str(local_data_path/'visualization')+'/'+args.dataset+'.png'
+draw_tsne(model,testloader,embedding_label,save_path)
