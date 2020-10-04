@@ -2,7 +2,6 @@
 
 import torch 
 import numpy as np
-from sklearn.manifold import TSNE
 import tqdm
 import matplotlib.pyplot as plt
 
@@ -87,6 +86,12 @@ def draw_tsne(model,dataloader,embedding_label,save_path='visualization/tsne.png
 
     #TSNE fit transform 
     print("calling tsne fit transfrom ",features.shape)
+    #sklearn
+    #from sklearn.manifold import TSNE
+    #tsne = TSNE(n_components=2).fit_transform(features)
+    
+    #tsnecuda
+    from tsnecuda import TSNE
     tsne = TSNE(n_components=2).fit_transform(features)
     print("tsne shape",tsne.shape)
     tx = tsne[:, 0]
@@ -97,4 +102,4 @@ def draw_tsne(model,dataloader,embedding_label,save_path='visualization/tsne.png
     ty = scale_to_01_range(ty)
     print("tx",tx)
     print("labels",len(labels),labels)
-    visualize_tsne_points(tx, ty,save_path)
+    visualize_tsne_points(tx, ty,labels,save_path)
