@@ -25,6 +25,6 @@ import os
 
 ######################## CONDITIONED TRAINING ###########################################################################################
 
-os.system("python train_conditioned.py  --lr 0.1")
-os.system("python train_conditioned.py  --cifar_checkpoint_path experiments/conditioned/cifar/checkpoint.pth --fashion_mnist_checkpoint_path experiments/conditioned/fashion_mnist/checkpoint.pth --lr 0.01")
-os.system("python train_conditioned.py  --cifar_checkpoint_path experiments/conditioned/cifar/checkpoint.pth --fashion_mnist_checkpoint_path experiments/conditioned/fashion_mnist/checkpoint.pth --lr 0.001")
+os.system("CUDA_VISIBLE_DEVICES=0 python train_conditioned.py  --lr 0.1")
+os.system("CUDA_VISIBLE_DEVICES=0 python train_conditioned.py  --cifar_checkpoint_path experiments/conditioned/cifar/checkpoint.pth --fashion_mnist_checkpoint_path experiments/conditioned/fashion_mnist/checkpoint.pth --lr 0.01")
+os.system("CUDA_VISIBLE_DEVICES=0 python train_conditioned.py  --cifar_checkpoint_path experiments/conditioned/cifar/checkpoint.pth --fashion_mnist_checkpoint_path experiments/conditioned/fashion_mnist/checkpoint.pth --lr 0.001")
