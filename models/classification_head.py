@@ -9,7 +9,7 @@ class ClassificationHead(nn.Module):
                 in_channels=512):
         super(ClassificationHead, self).__init__()
 
-        self.fc_layer= F.softmax(nn.Linear(in_channels, num_classes))
+        self.fc_layer= nn.Linear(in_channels, num_classes)
 
     def forward(self,x):
         x= self.fc_layer(x)
