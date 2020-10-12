@@ -158,7 +158,7 @@ def train(epoch):
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
         # break for debugging
-        break
+        
 # code to dump config at the path
 
 
@@ -221,6 +221,7 @@ def test(epoch):
         state = {
             'model': model.state_dict(),
             'classifier_cifar': classifier_cifar.state_dict(),
+            'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
             'cifar_acc': acc,
             'epoch': epoch,
         }
@@ -272,6 +273,7 @@ def test(epoch):
         #dump ony fashioon mnist data
         state = {
             'model': model.state_dict(),
+            'classifier_cifar': classifier_cifar.state_dict(),
             'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
             'fashion_mnist_acc': acc,
             'epoch': epoch,
