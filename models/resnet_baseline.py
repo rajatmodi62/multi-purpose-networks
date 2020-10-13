@@ -100,7 +100,7 @@ class ResNet(nn.Module):
         out = self.layer4(out)
         out = F.avg_pool2d(out, 4)
         out = out.view(out.size(0), -1)
-        # out = self.linear(out)
+        out = self.linear(out)
         return out
 
 
@@ -112,8 +112,8 @@ def ResNet34():
     return ResNet(BasicBlock, [3, 4, 6, 3])
 
 
-def ResNet50():
-    return ResNet(Bottleneck, [3, 4, 6, 3])
+def resnet50(in_channels=3):
+    return ResNet(Bottleneck, [3, 4, 6, 3],in_channels=in_channels)
 
 
 def ResNet101():
