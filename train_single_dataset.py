@@ -25,7 +25,7 @@ from dataloader.fashion_mnist import FashionMNIST
 from utils.utils import progress_bar
 
 from utils.variables import classifier_dict
-os.system("nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9")
+#os.system("nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9")
 
 # argparser arguments
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
