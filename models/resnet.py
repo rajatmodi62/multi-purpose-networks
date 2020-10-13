@@ -299,10 +299,12 @@ class ResNet(nn.Module):
         x = self.layer4(x)
 
         x = self.avgpool(x)
+        x= x.view(x.size(0), -1)
         #x = x.view(x.size(0), -1)
-        x = torch.flatten(x, 1)
-        if self.drop:
-            x = self.drop(x)
-        x = self.fc(x)
+        #x = torch.flatten(x, 1)
+        # if self.drop:
+        #     x = self.drop(x)
+        #print("rajat",x.shape)
+        #x = self.fc(x)
 
         return x
