@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # from models.resnet import resnet18
-from models.resnet_baseline import resnet18
-
+from models.resnet_baseline import resnet18,resnet50
+from models.resnest import resnest50
 
 #Hardcode in_channels if channels other than 3/4 are passed
 # To do: Load all the weights except first layer 
@@ -27,7 +27,13 @@ class Backbone(nn.Module):
             self.in_channels= 3
         #load model
         if backbone=='resnet18':
+            print("BACKBONE: RESNET18")
             self.backbone= resnet18(in_channels=self.in_channels)
+        elif backbone=='resnet50':
+            print("BACKBONE: RESNET50")
+            self.backbone= resnet50(in_channels=self.in_channels)
+        elif backbone=="resnest50":
+            self.backbone= resnest50(in_channels=self.in_channels)
         #define the embedding layer for now 
         if apply_embedding:
             self.embedding= nn.Embedding(2,32*32*1)
@@ -45,7 +51,7 @@ class Backbone(nn.Module):
         return x
 
 if __name__ == '__main__':
-    model= Backbone(apply_embedding=True)
+    model= Backbone(backbone='resnest50',apply_embedding=True)
     img= torch.randn(8,3,32,32)
     embedding_label= torch.tensor([[0],[1],[1],[0],[0],[0],[0],[0]])
     

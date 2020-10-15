@@ -26,6 +26,7 @@ from torch.utils.data.dataset import ConcatDataset
 
 #import progressbar
 from utils.utils import progress_bar
+from utils.variables import classifier_dict
 
 # trying to figure out how to enumerate over the two dataloaders
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -43,7 +44,8 @@ parser.add_argument("--training_type", type=str, default="conditioned",
                     help="type of training (conditioned")
 parser.add_argument("--num-workers", type=int, default=2,
                     help="Number of workers for dataloaders")
-
+parser.add_argument("--backbone", type=str, default="resnet18",
+                    help="BACKBONE TO TRAIN WITH:resnet18/resnet50/resnest50")
 args = parser.parse_args()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -158,7 +160,7 @@ def train(epoch):
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
         # break for debugging
-        break
+        
 # code to dump config at the path
 
 
@@ -221,6 +223,7 @@ def test(epoch):
         state = {
             'model': model.state_dict(),
             'classifier_cifar': classifier_cifar.state_dict(),
+            'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
             'cifar_acc': acc,
             'epoch': epoch,
         }
@@ -272,6 +275,7 @@ def test(epoch):
         #dump ony fashioon mnist data
         state = {
             'model': model.state_dict(),
+            'classifier_cifar': classifier_cifar.state_dict(),
             'classifier_fashion_mnist': classifier_fashion_mnist.state_dict(),
             'fashion_mnist_acc': acc,
             'epoch': epoch,
@@ -289,7 +293,7 @@ def test(epoch):
 local_data_path = Path('.').absolute()
 # create experiment
 experiment = args.training_type
-save_dir = (local_data_path/'experiments'/experiment)
+save_dir = (local_data_path/'experiments'/args.backbone/experiment)
 (save_dir/'cifar').mkdir(exist_ok=True, parents=True)
 (save_dir/'fashion_mnist').mkdir(exist_ok=True, parents=True)
 
@@ -297,11 +301,11 @@ save_dir = (local_data_path/'experiments'/experiment)
 trainloader, testloader_cifar, testloader_fashion_mnist = get_dataloaders()
 
 # get model with embedding
-model = Backbone(apply_embedding=True).to(device)
+model = Backbone(backbone=args.backbone,apply_embedding=True).to(device)
 
 # get two separate classifiers
-classifier_cifar = ClassificationHead(num_classes=10).to(device)
-classifier_fashion_mnist = ClassificationHead(num_classes=10).to(device)
+classifier_cifar = ClassificationHead(num_classes=10,in_channels=classifier_dict[args.backbone]).to(device)
+classifier_fashion_mnist = ClassificationHead(num_classes=10,in_channels=classifier_dict[args.backbone]).to(device)
 
 # create loss
 criterion = nn.CrossEntropyLoss()

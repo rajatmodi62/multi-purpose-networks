@@ -24,6 +24,10 @@ from dataloader.cifar_fashmnist import CIFAR_FASHMNIST
 
 #import progressbar
 from utils.utils import progress_bar
+
+from utils.variables import classifier_dict
+
+
 # argparser arguments
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 
@@ -38,6 +42,8 @@ parser.add_argument("--training_type", type=str, default="combined",
                     help="type of training (combined")
 parser.add_argument("--num-workers", type=int, default=2,
                     help="Number of workers for dataloaders")
+parser.add_argument("--backbone", type=str, default="resnet18",
+                    help="BACKBONE TO TRAIN WITH:resnet18/resnet50/resnest50")
 # parser.add_argument("--embedding_layer",action='store_true',
 #                     help="Switch this flag on if embedding layer is to be trained")
 args = parser.parse_args()
@@ -228,19 +234,19 @@ def test_combined_datasets(epoch):
 local_data_path = Path('.').absolute()
 # create experiment
 experiment = args.training_type
-save_dir = (local_data_path/'experiments'/experiment)
+save_dir = (local_data_path/'experiments'/args.backbone/experiment)
 (save_dir/'cifar').mkdir(exist_ok=True, parents=True)
 (save_dir/'fashion_mnist').mkdir(exist_ok=True, parents=True)
 
 # get dataloaders
 trainloader, testloader_cifar, testloader_fashion_mnist = get_dataloaders()
 # get model without embedding
-model = Backbone().to(device)
+model = Backbone(backbone=args.backbone).to(device)
 # get classifier
 if args.training_type == "combined":
-    classifier = ClassificationHead(num_classes=20).to(device)
+    classifier = ClassificationHead(num_classes=20,in_channels=classifier_dict[args.backbone]).to(device)
 else:
-    classifier = ClassificationHead(num_classes=10).to(device)
+    classifier = ClassificationHead(num_classes=10,in_channels=classifier_dict[args.backbone]).to(device)
 
 # create loss
 criterion = nn.CrossEntropyLoss()
