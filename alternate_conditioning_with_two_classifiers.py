@@ -41,14 +41,15 @@ parser.add_argument("--batch-size", type=int, default=128,
 parser.add_argument("--num-workers", type=int, default=0,
                     help="Number of workers for dataloaders")
 
-
+parser.add_argument("--backbone", type=str, default="resnet18",
+                    help="BACKBONE TO TRAIN WITH:resnet18/resnet50/resnest50")
 args = parser.parse_args()
 
 #define device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 #intialize the model
-model = Backbone(apply_embedding=True).to(device)
+model = Backbone(backbone=args.backbone,apply_embedding=True).to(device)
 
 #get a classifier [name is independendent of cifar/fashion_mnist now]
 classifier_cifar= ClassificationHead(num_classes=10).to(device)
