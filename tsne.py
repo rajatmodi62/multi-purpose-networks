@@ -31,7 +31,7 @@ def scale_to_01_range(x):
     # make the distribution fit [0; 1] by dividing by its range
     return starts_from_zero / value_range
 
-def visualize_tsne_points(tx, ty, labels,save_path):
+def visualize_tsne_points(tx, ty, labels,save_path,title='cifar'):
     # initialize matplotlib plot
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -54,14 +54,20 @@ def visualize_tsne_points(tx, ty, labels,save_path):
         ax.scatter(current_tx, current_ty, c=color, label=label)
 
     # build a legend using the labels we set previously
-    ax.legend(loc='best')
+    # ax.legend(loc='best', mode='expand', numpoints=1, ncol=4, fancybox = True,
+    #        fontsize='small')
+    from matplotlib.font_manager import FontProperties
+
+    fontP = FontProperties()
+    fontP.set_size('xx-small')
+    ax.legend(bbox_to_anchor=(1.05, 1), title=title,loc='upper left', prop=fontP)
 
     # finally, show the plot
     # plt.show()
     fig.savefig(save_path)
 
     
-def draw_tsne(model,dataloader,embedding_label,save_path='visualization/tsne.png'):
+def draw_tsne(model,dataloader,embedding_label,save_path='visualization/tsne.png',title='cifar'):
     model.eval()
     features = None
     labels= []
@@ -102,4 +108,40 @@ def draw_tsne(model,dataloader,embedding_label,save_path='visualization/tsne.png
     ty = scale_to_01_range(ty)
     print("tx",tx)
     print("labels",len(labels),labels)
-    visualize_tsne_points(tx, ty,labels,save_path)
+    visualize_tsne_points(tx, ty,labels,save_path,title)
+
+def draw_tsne_combined(model,dataloader,save_path='visualization/tsne.png',title='cifar'):
+    model.eval()
+    features = None
+    labels= []
+    for batch_idx,batch in enumerate(dataloader):
+        images, targets, meta= batch
+        images=images.to(device) 
+        images= images.permute(0, 3, 1, 2)
+        labels+=targets.tolist()
+        with torch.no_grad():
+            output = model(images)
+        current_features = output.cpu().numpy()
+        if features is not None:
+            features = np.concatenate((features, current_features))
+        else:
+            features = current_features
+    #TSNE fit transform 
+    print("calling tsne fit transfrom ",features.shape)
+    #sklearn
+    #from sklearn.manifold import TSNE
+    #tsne = TSNE(n_components=2).fit_transform(features)
+    
+    #tsnecuda
+    from tsnecuda import TSNE
+    tsne = TSNE(n_components=2).fit_transform(features)
+    print("tsne shape",tsne.shape)
+    tx = tsne[:, 0]
+    ty = tsne[:, 1]
+    
+    # scale and move the coordinates so they fit [0; 1] range
+    tx = scale_to_01_range(tx)
+    ty = scale_to_01_range(ty)
+    print("tx",tx)
+    print("labels",len(labels),labels)
+    visualize_tsne_points(tx, ty,labels,save_path,title)
